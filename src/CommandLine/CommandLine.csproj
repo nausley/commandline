@@ -61,6 +61,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Content Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
@@ -149,7 +150,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-<!--   <Target Name="BeforeBuild" DependsOnTargets="PaketInstall">
+  <!--   <Target Name="BeforeBuild" DependsOnTargets="PaketInstall">
   </Target>
   <Target Name="BootstrapPaket" Condition="!Exists('$(SolutionDir).paket/paket.bootstrapper.exe)')">
     <Exec Command="$(SolutionDir).paket/paket.bootstrapper.exe" />
