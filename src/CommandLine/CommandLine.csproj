@@ -149,14 +149,14 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Target Name="BeforeBuild" DependsOnTargets="PaketInstall">
+<!--   <Target Name="BeforeBuild" DependsOnTargets="PaketInstall">
   </Target>
   <Target Name="BootstrapPaket" Condition="!Exists('$(SolutionDir).paket/paket.bootstrapper.exe)')">
     <Exec Command="$(SolutionDir).paket/paket.bootstrapper.exe" />
   </Target>
   <Target Name="PaketInstall" DependsOnTargets="BootstrapPaket" Condition="!Exists('$(SolutionDir)paket-files')">
     <Exec Command="$(SolutionDir).paket/paket install" />
-  </Target>
+  </Target> -->
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v2.0' Or $(TargetFrameworkVersion) == 'v3.0' Or $(TargetFrameworkVersion) == 'v3.5')">
       <ItemGroup>
