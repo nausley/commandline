@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.FSharp.Core;
 using CommandLine.Core;
+using CommandLine.Infrastructure;
+
 using CSharpx;
 using CommandLine.Tests.Fakes;
 using FluentAssertions;
@@ -890,7 +892,7 @@ namespace CommandLine.Tests.Unit.Core
         }
 
         [Fact]
-        public static void Parse_to_type_with_single_string_ctor_builds_up_correct_instance()
+        public void Parse_to_type_with_single_string_ctor_builds_up_correct_instance()
         {
             // Fixture setup
             var expectedResult = new Options_With_Uri_And_SimpleType { EndPoint = new Uri("http://localhost/test/"), MyValue = new MySimpleType("custom-value") };
@@ -901,6 +903,45 @@ namespace CommandLine.Tests.Unit.Core
 
             // Verify outcome
             expectedResult.ShouldBeEquivalentTo(((Parsed<Options_With_Uri_And_SimpleType>)result).Value);
+
+            // Teardown
+        }
+
+        [Theory]
+        [InlineData(new[] { "--stringvalue", "x-" }, "x-")]
+        [InlineData(new[] { "--stringvalue", "x--" }, "x--")]
+        [InlineData(new[] { "--stringvalue", "x---" }, "x---")]
+        [InlineData(new[] { "--stringvalue=x-x" }, "x-x")]
+        [InlineData(new[] { "--stringvalue=x--x" }, "x--x")]
+        [InlineData(new[] { "--stringvalue=x---x" }, "x---x")]
+        [InlineData(new[] { "--stringvalue", "5366ebc4-7aa7-4d5a-909c-a415a291a5ad" }, "5366ebc4-7aa7-4d5a-909c-a415a291a5ad")]
+        [InlineData(new[] { "--stringvalue=5366ebc4-7aa7-4d5a-909c-a415a291a5ad" }, "5366ebc4-7aa7-4d5a-909c-a415a291a5ad")]
+        public void Parse_string_with_dashes_except_in_beginning(string[] arguments, string expected)
+        {
+            // Fixture setup in attributes
+
+            // Exercize system 
+            var result = InvokeBuild<Simple_Options>(
+                arguments);
+
+            // Verify outcome
+            expected.ShouldBeEquivalentTo(((Parsed<Simple_Options>)result).Value.StringValue);
+
+            // Teardown
+        }
+
+        [Theory]
+        [MemberData("GuidData")]
+        public void Parse_Guid(string[] arguments, Options_With_Guid expected)
+        {
+            // Fixture setup in attributes
+
+            // Exercize system 
+            var result = InvokeBuild<Options_With_Guid>(
+                arguments);
+
+            // Verify outcome
+            expected.ShouldBeEquivalentTo(((Parsed<Options_With_Guid>)result).Value);
 
             // Teardown
         }
@@ -940,6 +981,19 @@ namespace CommandLine.Tests.Unit.Core
                 yield return new object[] { new[] { "-x" }, new Immutable_Simple_Options("", new int[] { }, true, default(long)) };
                 yield return new object[] { new[] { "9876543210" }, new Immutable_Simple_Options("", new int[] { }, default(bool), 9876543210L) };
                 yield return new object[] { new[] { "--stringvalue=strval0", "-i", "9", "7", "8", "-x", "9876543210" }, new Immutable_Simple_Options("strval0", new[] { 9, 7, 8 }, true, 9876543210L) };
+            }
+        }
+
+        public static IEnumerable<object> GuidData
+        {
+            get
+            {
+                var guid0 = Guid.NewGuid();
+                var guid1 = Guid.NewGuid();
+                yield return new object[] { new[] { "--txid", guid0.ToStringInvariant() }, new Options_With_Guid { TransactionId = guid0 } };
+                yield return new object[] { new[] { "--txid=" + guid1.ToStringInvariant() }, new Options_With_Guid { TransactionId = guid1 } };
+                yield return new object[] { new[] { "-t", guid0.ToStringInvariant() }, new Options_With_Guid { TransactionId = guid0 } };
+                yield return new object[] { new[] { "-t" + guid1.ToStringInvariant() }, new Options_With_Guid { TransactionId = guid1 } };
             }
         }
     }

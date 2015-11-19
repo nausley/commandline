@@ -148,6 +148,9 @@ namespace CommandLine
                         .Append(FormatOption((OptionSpecification)opt.Specification, opt.Value, settings))
                         .Append(' ')
                 );
+
+            builder.AppendWhen(valSpecs.Any() && parser.Settings.EnableDashDash, "-- ");
+
             valSpecs.ForEach(
                 val => builder.Append(FormatValue(val.Specification, val.Value)).Append(' '));
 
